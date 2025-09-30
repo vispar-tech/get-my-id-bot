@@ -83,5 +83,8 @@ test: ## Run tests
 .PHONY: quick-start
 quick-start: setup-env build run ## Quick start: setup env, build and run
 
+.PHONY: quick-start-detached
+quick-start-detached: setup-env build run-detached ## Quick start: setup env, build and run (detached)
+
 .PHONY: quick-dev
 quick-dev: install dev ## Quick development: install deps and run locally

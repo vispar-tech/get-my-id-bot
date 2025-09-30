@@ -7,6 +7,7 @@ import os
 
 from dotenv import load_dotenv
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -44,14 +45,18 @@ async def start_command(
 
     if not user or not chat:
         await update.message.reply_text(
-            "Unable to get user or chat information.",
+            "<b>⚠️ Error:</b> Unable to get user or chat information.",
+            parse_mode=ParseMode.HTML,
         )
         return
 
-    response = f"Your user ID: {user.id}\n"
-    response += f"Current chat ID: {chat.id}"
+    response = (
+        "<b>🎉 Welcome!</b>\n\n"
+        f"<b>👤 Your user ID:</b> <code>{user.id}</code>\n"
+        f"<b>💬 Current chat ID:</b> <code>{chat.id}</code>"
+    )
 
-    await update.message.reply_text(response)
+    await update.message.reply_text(response, parse_mode=ParseMode.HTML)
 
 
 async def help_command(
@@ -62,22 +67,22 @@ async def help_command(
     Handle /help command - show detailed help information.
     """
     help_text = (
-        "I will send you your telegram user ID, "
-        "current chat ID and sender ID or "
+        "<b>📱 Bot Information</b>\n\n"
+        "I will send you your telegram user ID, current chat ID and sender ID or "
         "chat ID of forwarded message.\n\n"
-        "User ID - your unique identifier in telegram, "
-        "which you can use in your "
+        "<b>ℹ️ What is User ID?</b>\n"
+        "User ID is your unique identifier in telegram, which you can use in your "
         "telegram bot. Read more: https://core.telegram.org/bots/api#user\n\n"
-        "Commands:\n"
-        "/start - Get your user ID and current chat ID\n"
-        "/help - Show this help message\n\n"
-        "You can also forward any message to me to get the sender's ID and "
+        "<b>📋 Available Commands:</b>\n"
+        "• /start - Get your user ID and current chat ID\n"
+        "• /help - Show this help message\n\n"
+        "<b>💡 Tip:</b> You can also forward any message to me to get the sender's ID and "
         "original chat ID."
     )
     if not update.message:
         return
 
-    await update.message.reply_text(help_text)
+    await update.message.reply_text(help_text, parse_mode=ParseMode.HTML)
 
 
 async def handle_message(
@@ -97,61 +102,66 @@ async def handle_message(
     chat_id = update.effective_chat.id if update.effective_chat else "Unknown"
 
     response_parts = [
-        f"Your user ID: {user_id}",
-        f"Current chat ID: {chat_id}",
+        "<b>📊 Message Information</b>\n",
+        f"<b>👤 Your user ID:</b> <code>{user_id}</code>",
+        f"<b>💬 Current chat ID:</b> <code>{chat_id}</code>",
     ]
 
     # Check if message is forwarded
     if message.forward_from:
         # Message forwarded from a user
         response_parts.append(
-            f"Forwarded from user ID: {message.forward_from.id}",
+            f"<b>↪️ Forwarded from user ID:</b> <code>{message.forward_from.id}</code>",
         )
         if message.forward_from.username:
             response_parts.append(
-                f"Forwarded from username: @{message.forward_from.username}",
+                f"<b>👤 Forwarded from username:</b> @{message.forward_from.username}",
             )
 
     elif message.forward_from_chat:
         # Message forwarded from a channel/group
         response_parts.append(
-            f"Forwarded from chat ID: {message.forward_from_chat.id}",
+            f"<b>↪️ Forwarded from chat ID:</b> <code>{message.forward_from_chat.id}</code>",
         )
         response_parts.append(
-            f"Forwarded from chat title: {message.forward_from_chat.title}",
+            f"<b>📢 Forwarded from chat title:</b> {message.forward_from_chat.title}",
         )
         if message.forward_from_chat.username:
             response_parts.append(
-                "Forwarded from chat "
-                f"username: @{message.forward_from_chat.username}",
+                "<b>📢 Forwarded from chat username:</b> "
+                f"@{message.forward_from_chat.username}",
             )
 
     elif message.forward_sender_name:
         # Message forwarded from a user who has privacy settings enabled
         response_parts.append(
-            f"Forwarded from sender name: {message.forward_sender_name}",
+            f"<b>↪️ Forwarded from sender name:</b> {message.forward_sender_name}",
         )
 
     # Check for reply to message
     if message.reply_to_message:
         reply_user = message.reply_to_message.from_user
         if reply_user:
-            response_parts.append(f"Replying to user ID: {reply_user.id}")
+            response_parts.append(
+                f"<b>↩️ Replying to user ID:</b> <code>{reply_user.id}</code>"
+            )
             if reply_user.username:
                 response_parts.append(
-                    f"Replying to username: @{reply_user.username}",
+                    f"<b>👤 Replying to username:</b> @{reply_user.username}",
                 )
 
     # Check for message sender (if different from effective user)
     if message.from_user and message.from_user.id != user_id:
-        response_parts.append(f"Message sender ID: {message.from_user.id}")
+        response_parts.append(
+            f"<b>📨 Message sender ID:</b> <code>{message.from_user.id}</code>"
+        )
         if message.from_user.username:
             response_parts.append(
-                f"Message sender username: @{message.from_user.username}",
+                f"<b>👤 Message sender username:</b> @{message.from_user.username}",
             )
 
     response = "\n".join(response_parts)
-    await message.reply_text(response)
+    await message.reply_text(response, parse_mode=ParseMode.HTML)
 
 
 def main() -> None:

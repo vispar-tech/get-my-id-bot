@@ -57,6 +57,7 @@ A simple Telegram bot that extracts user IDs, chat IDs, and other identifiers fr
 
 -   `make help` - Show all available commands
 -   `make quick-start` - Setup env, build and run (Docker)
+-   `make quick-start-detached` - Setup env, build and run (Docker, detached)
 -   `make quick-dev` - Install deps and run locally
 -   `make build` - Build Docker image
 -   `make run` - Run bot in Docker container
